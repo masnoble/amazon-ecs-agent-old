@@ -18,3 +18,12 @@ type credentialsProxyRoute interface {
 	Create() error
 	Remove() error
 }
+
+type loopbackRouting interface {
+	Enable() error
+	RestoreDefault() error
+}
+
+type ipv6RouterAdvertisements interface {
+	Disable() error
+}

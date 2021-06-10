@@ -52,6 +52,7 @@ import (
 	"github.com/aws/amazon-ecs-agent/agent/stats"
 	"github.com/aws/amazon-ecs-agent/agent/exec"
 	"github.com/aws/amazon-ecs-agent/agent/exec/iptables"
+	"github.com/aws/amazon-ecs-agent/agent/exec/sysctl"
 	"github.com/aws/amazon-ecs-agent/agent/taskresource"
 	tcshandler "github.com/aws/amazon-ecs-agent/agent/tcs/handler"
 	"github.com/aws/amazon-ecs-agent/agent/utils"
@@ -130,6 +131,8 @@ type ecsAgent struct {
 	availabilityZone            string
 	latestSeqNumberTaskManifest *int64
 	credentialsProxyRoute    credentialsProxyRoute
+	loopbackRouting          loopbackRouting
+	ipv6RouterAdvertisements ipv6RouterAdvertisements
 }
 
 // newAgent returns a new ecsAgent object, but does not start anything
@@ -192,6 +195,16 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 		metadataManager = containermetadata.NewManager(dockerClient, cfg)
 	}
 	cmdExec := exec.NewExec()
+
+	loopbackRouting, err := sysctl.NewIpv4RouteLocalNet(cmdExec)
+	if err != nil {
+		return nil, err
+	}
+	ipv6RouterAdvertisements, err := sysctl.NewIpv6RouterAdvertisements(cmdExec)
+	if err != nil {
+		return nil, err
+	}
+
 	credentialsProxyRoute, err := iptables.NewNetfilterRoute(cmdExec)
 	if err != nil {
 		return nil, err
@@ -219,6 +232,8 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 		mobyPlugins:                 mobypkgwrapper.NewPlugins(),
 		latestSeqNumberTaskManifest: &initialSeqNumber,
 		credentialsProxyRoute:    credentialsProxyRoute,
+		loopbackRouting:          loopbackRouting,
+		ipv6RouterAdvertisements: ipv6RouterAdvertisements,
 	}, nil
 }
 
@@ -243,10 +258,6 @@ func (agent *ecsAgent) setTerminationHandler(handler sighandlers.TerminationHand
 // start starts the ECS Agent
 func (agent *ecsAgent) start() int {
 	
-	err := agent.credentialsProxyRoute.Create()
-	if err != nil {
-		fmt.Printf("Yaaaa... so something is messed up here on line 248 of agent.go in the app folder")
-	}
 
 	sighandlers.StartDebugHandler()
 
