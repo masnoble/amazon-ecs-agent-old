@@ -264,12 +264,12 @@ func (agent *ecsAgent) preStart() string {
 		fmt.Printf("Yaaaa... so something is messed up here on loopbackrouting of agent.go in the app folder")
 	}
 	// Disable ipv6 router advertisements
-	err := agent.ipv6RouterAdvertisements.Disable()
+	err = agent.ipv6RouterAdvertisements.Disable()
 	if err != nil {
 		fmt.Printf("Yaaaa... so something is messed up here on ipv6 of agent.go in the app folder")
 	}
 
-	err := agent.credentialsProxyRoute.Create()
+	err = agent.credentialsProxyRoute.Create()
 	if err != nil {
 		fmt.Printf("Yaaaa... so something is messed up here in credendtials of agent.go in the app folder")
 	}
