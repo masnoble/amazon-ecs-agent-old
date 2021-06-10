@@ -50,6 +50,8 @@ import (
 	"github.com/aws/amazon-ecs-agent/agent/sighandlers/exitcodes"
 	"github.com/aws/amazon-ecs-agent/agent/statemanager"
 	"github.com/aws/amazon-ecs-agent/agent/stats"
+	"github.com/aws/amazon-ecs-agent/agent/exec"
+	"github.com/aws/amazon-ecs-agent/agent/exec/iptables"
 	"github.com/aws/amazon-ecs-agent/agent/taskresource"
 	tcshandler "github.com/aws/amazon-ecs-agent/agent/tcs/handler"
 	"github.com/aws/amazon-ecs-agent/agent/utils"
@@ -127,6 +129,7 @@ type ecsAgent struct {
 	resourceFields              *taskresource.ResourceFields
 	availabilityZone            string
 	latestSeqNumberTaskManifest *int64
+	credentialsProxyRoute    credentialsProxyRoute
 }
 
 // newAgent returns a new ecsAgent object, but does not start anything
@@ -189,6 +192,11 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 		metadataManager = containermetadata.NewManager(dockerClient, cfg)
 	}
 
+	credentialsProxyRoute, err := iptables.NewNetfilterRoute(cmdExec)
+	if err != nil {
+		return nil, err
+	}
+
 	initialSeqNumber := int64(-1)
 	return &ecsAgent{
 		ctx:               ctx,
@@ -210,6 +218,7 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 		terminationHandler:          sighandlers.StartDefaultTerminationHandler,
 		mobyPlugins:                 mobypkgwrapper.NewPlugins(),
 		latestSeqNumberTaskManifest: &initialSeqNumber,
+		credentialsProxyRoute:    credentialsProxyRoute,
 	}, nil
 }
 
@@ -233,6 +242,12 @@ func (agent *ecsAgent) setTerminationHandler(handler sighandlers.TerminationHand
 
 // start starts the ECS Agent
 func (agent *ecsAgent) start() int {
+	
+	err = e.credentialsProxyRoute.Create()
+	if err != nil {
+		return engineError("could not create route to the credentials proxy", err)
+	}
+
 	sighandlers.StartDebugHandler()
 
 	containerChangeEventStream := eventstream.NewEventStream(containerChangeEventStreamName, agent.ctx)
