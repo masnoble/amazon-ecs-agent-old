@@ -92,6 +92,7 @@ var (
 // object. Its purpose is to mostly demonstrate how to interact with the
 // ecsAgent type.
 type agent interface {
+	preStart() string
 	// printECSAttributes prints the Agent's capabilities based on
 	// its environment
 	printECSAttributes() int
@@ -258,12 +259,12 @@ func (agent *ecsAgent) setTerminationHandler(handler sighandlers.TerminationHand
 func (agent *ecsAgent) preStart() string {
 
 	// Enable use of loopback addresses for local routing purposes
-	err = agent.loopbackRouting.Enable()
+	err := agent.loopbackRouting.Enable()
 	if err != nil {
 		fmt.Printf("Yaaaa... so something is messed up here on loopbackrouting of agent.go in the app folder")
 	}
 	// Disable ipv6 router advertisements
-	err = agent.ipv6RouterAdvertisements.Disable()
+	err := agent.ipv6RouterAdvertisements.Disable()
 	if err != nil {
 		fmt.Printf("Yaaaa... so something is messed up here on ipv6 of agent.go in the app folder")
 	}
