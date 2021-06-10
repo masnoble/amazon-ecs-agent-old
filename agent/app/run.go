@@ -19,8 +19,6 @@ import (
 	"time"
 
 
-	"github.com/aws/amazon-ecs-agent/agent/exec/iptables"
-	"github.com/aws/amazon-ecs-agent/agent/exec/sysctl"
 	"github.com/aws/amazon-ecs-agent/agent/app/args"
 	"github.com/aws/amazon-ecs-agent/agent/logger"
 	"github.com/aws/amazon-ecs-agent/agent/sighandlers/exitcodes"
@@ -76,22 +74,8 @@ func Run(arguments []string) int {
 		return exitcodes.ExitError
 	}
 
-	// Enable use of loopback addresses for local routing purposes
-	err = agent.loopbackRouting.Enable()
-	if err != nil {
-		fmt.Printf("Yaaaa... so something is messed up here on loopbackrouting of agent.go in the app folder")
-	}
-	// Disable ipv6 router advertisements
-	err = agent.ipv6RouterAdvertisements.Disable()
-	if err != nil {
-		fmt.Printf("Yaaaa... so something is messed up here on ipv6 of agent.go in the app folder")
-	}
-
-	err := agent.credentialsProxyRoute.Create()
-	if err != nil {
-		fmt.Printf("Yaaaa... so something is messed up here in credendtials of agent.go in the app folder")
-	}
-
+	fmt.Printf("%v",agent.preStart())
+	
 
 	switch {
 	case *parsedArgs.ECSAttributes:

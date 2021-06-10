@@ -255,6 +255,27 @@ func (agent *ecsAgent) setTerminationHandler(handler sighandlers.TerminationHand
 	agent.terminationHandler = handler
 }
 
+func (agent *ecsAgent) preStart() string {
+
+	// Enable use of loopback addresses for local routing purposes
+	err = agent.loopbackRouting.Enable()
+	if err != nil {
+		fmt.Printf("Yaaaa... so something is messed up here on loopbackrouting of agent.go in the app folder")
+	}
+	// Disable ipv6 router advertisements
+	err = agent.ipv6RouterAdvertisements.Disable()
+	if err != nil {
+		fmt.Printf("Yaaaa... so something is messed up here on ipv6 of agent.go in the app folder")
+	}
+
+	err := agent.credentialsProxyRoute.Create()
+	if err != nil {
+		fmt.Printf("Yaaaa... so something is messed up here in credendtials of agent.go in the app folder")
+	}
+
+	return "Ok, so the IPstuff shoullllld have been done just now \n"
+}
+
 // start starts the ECS Agent
 func (agent *ecsAgent) start() int {
 	
