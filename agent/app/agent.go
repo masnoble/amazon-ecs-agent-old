@@ -191,7 +191,7 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 		// the appropriate version
 		metadataManager = containermetadata.NewManager(dockerClient, cfg)
 	}
-
+	cmdExec := exec.NewExec()
 	credentialsProxyRoute, err := iptables.NewNetfilterRoute(cmdExec)
 	if err != nil {
 		return nil, err
@@ -243,9 +243,9 @@ func (agent *ecsAgent) setTerminationHandler(handler sighandlers.TerminationHand
 // start starts the ECS Agent
 func (agent *ecsAgent) start() int {
 	
-	err = e.credentialsProxyRoute.Create()
+	err := agent.credentialsProxyRoute.Create()
 	if err != nil {
-		return engineError("could not create route to the credentials proxy", err)
+		fmt.Printf("Yaaaa... so something is messed up here on line 248 of agent.go in the app folder")
 	}
 
 	sighandlers.StartDebugHandler()
