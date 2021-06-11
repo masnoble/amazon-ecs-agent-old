@@ -94,7 +94,29 @@ package errors
 import (
 	"fmt"
 	"io"
+	"path"
+	"runtime"
+	"strings"
 )
+
+// Frame represents a program counter inside a stack frame.
+type Frame uintptr
+
+// pc returns the program counter for this frame;
+// multiple frames may have the same PC value.
+func (f Frame) pc() uintptr { return uintptr(f) - 1 }
+
+// file returns the full path to the file that contains the
+// function for this Frame's pc.
+func (f Frame) file() string {
+	fn := runtime.FuncForPC(f.pc())
+	if fn == nil {
+		return "unknown"
+	}
+	file, _ := fn.FileLine(f.pc())
+	return file
+}
+
 
 // New returns an error with the supplied message.
 // New also records the stack trace at the point it was called.

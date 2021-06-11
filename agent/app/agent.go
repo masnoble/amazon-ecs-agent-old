@@ -195,8 +195,8 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 		// the appropriate version
 		metadataManager = containermetadata.NewManager(dockerClient, cfg)
 	}
-	cmdExec := exec.NewExec()
 
+	cmdExec := exec.NewExec()
 	loopbackRouting, err := sysctl.NewIpv4RouteLocalNet(cmdExec)
 	if err != nil {
 		cancel()
@@ -207,7 +207,6 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 		cancel()
 		return nil, err
 	}
-
 	credentialsProxyRoute, err := iptables.NewNetfilterRoute(cmdExec)
 	if err != nil {
 		cancel()
@@ -264,17 +263,17 @@ func (agent *ecsAgent) preStart() string {
 	// Enable use of loopback addresses for local routing purposes
 	err := agent.loopbackRouting.Enable()
 	if err != nil {
-		fmt.Printf("Yaaaa... so something is messed up here on loopbackrouting of agent.go in the app folder")
+		fmt.Printf("Yaaaa... so something is messed up here on loopbackrouting of agent.go in the app folder\n")
 	}
 	// Disable ipv6 router advertisements
 	err = agent.ipv6RouterAdvertisements.Disable()
 	if err != nil {
-		fmt.Printf("Yaaaa... so something is messed up here on ipv6 of agent.go in the app folder")
+		fmt.Printf("Yaaaa... so something is messed up here on ipv6 of agent.go in the app folder\n")
 	}
 
 	err = agent.credentialsProxyRoute.Create()
 	if err != nil {
-		fmt.Printf("Yaaaa... so something is messed up here in credendtials of agent.go in the app folder")
+		fmt.Printf("Yaaaa... so something is messed up here in credendtials of agent.go in the app folder\n")
 	}
 
 	return "Ok, so the IPstuff shoullllld have been done just now \n"
