@@ -199,15 +199,18 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 
 	loopbackRouting, err := sysctl.NewIpv4RouteLocalNet(cmdExec)
 	if err != nil {
+		cancel()
 		return nil, err
 	}
 	ipv6RouterAdvertisements, err := sysctl.NewIpv6RouterAdvertisements(cmdExec)
 	if err != nil {
+		cancel()
 		return nil, err
 	}
 
 	credentialsProxyRoute, err := iptables.NewNetfilterRoute(cmdExec)
 	if err != nil {
+		cancel()
 		return nil, err
 	}
 
