@@ -92,7 +92,7 @@ var (
 // object. Its purpose is to mostly demonstrate how to interact with the
 // ecsAgent type.
 type agent interface {
-	preStart() string
+	preStart()
 	// printECSAttributes prints the Agent's capabilities based on
 	// its environment
 	printECSAttributes() int
@@ -131,9 +131,9 @@ type ecsAgent struct {
 	resourceFields              *taskresource.ResourceFields
 	availabilityZone            string
 	latestSeqNumberTaskManifest *int64
-	credentialsProxyRoute    credentialsProxyRoute
-	loopbackRouting          loopbackRouting
-	ipv6RouterAdvertisements ipv6RouterAdvertisements
+	credentialsProxyRoute    	credentialsProxyRoute
+	loopbackRouting          	loopbackRouting
+	ipv6RouterAdvertisements 	ipv6RouterAdvertisements
 }
 
 // newAgent returns a new ecsAgent object, but does not start anything
@@ -234,9 +234,9 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 		terminationHandler:          sighandlers.StartDefaultTerminationHandler,
 		mobyPlugins:                 mobypkgwrapper.NewPlugins(),
 		latestSeqNumberTaskManifest: &initialSeqNumber,
-		credentialsProxyRoute:    credentialsProxyRoute,
-		loopbackRouting:          loopbackRouting,
-		ipv6RouterAdvertisements: ipv6RouterAdvertisements,
+		credentialsProxyRoute:    	 credentialsProxyRoute,
+		loopbackRouting:         	 loopbackRouting,
+		ipv6RouterAdvertisements: 	 ipv6RouterAdvertisements,
 	}, nil
 }
 
@@ -260,6 +260,15 @@ func (agent *ecsAgent) setTerminationHandler(handler sighandlers.TerminationHand
 
 func (agent *ecsAgent) preStart() string {
 
+
+
+	fmt.Printf("This is the end of the preStart function \n")
+
+}
+
+// start starts the ECS Agent
+func (agent *ecsAgent) start() int {
+
 	// Enable use of loopback addresses for local routing purposes
 	err := agent.loopbackRouting.Enable()
 	if err != nil {
@@ -275,13 +284,6 @@ func (agent *ecsAgent) preStart() string {
 	if err != nil {
 		fmt.Printf("Yaaaa... so something is messed up here in credendtials of agent.go in the app folder\n")
 	}
-
-	return "Ok, so the IPstuff shoullllld have been done just now \n"
-}
-
-// start starts the ECS Agent
-func (agent *ecsAgent) start() int {
-	
 
 	sighandlers.StartDebugHandler()
 

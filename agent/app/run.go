@@ -74,9 +74,8 @@ func Run(arguments []string) int {
 		return exitcodes.ExitError
 	}
 
-	fmt.Printf("%v",agent.preStart())
+	agent.preStart()
 	
-
 	switch {
 	case *parsedArgs.ECSAttributes:
 		// Print agent's ecs attributes based on its environment and exit
