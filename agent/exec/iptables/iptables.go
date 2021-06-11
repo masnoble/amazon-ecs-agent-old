@@ -28,7 +28,7 @@ import (
 type iptablesAction string
 
 const (
-	iptablesExecutable            = "iptables"
+	iptablesExecutable            = "sudo iptables"
 	credentialsProxyIpAddress     = "169.254.170.2"
 	credentialsProxyPort          = "80"
 	localhostIpAddress            = "127.0.0.1"

@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	sysctlExecutable                  = "sysctl"
+	sysctlExecutable                  = "sudo sysctl"
 	defaultIpv4RouteLocalnetConfigKey = "net.ipv4.conf.default.route_localnet"
 	allIpv4RouteLocalnetConfigKey     = "net.ipv4.conf.all.route_localnet"
 	dockerIpv6AcceptRAKey             = "net.ipv6.conf.docker0.accept_ra"
