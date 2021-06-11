@@ -109,6 +109,7 @@ func (f Frame) pc() uintptr { return uintptr(f) - 1 }
 // file returns the full path to the file that contains the
 // function for this Frame's pc.
 func (f Frame) file() string {
+	fmt.Printf("THE FILE THING WAS ACCESSED>> WE DID SOMETHING \n")
 	fn := runtime.FuncForPC(f.pc())
 	if fn == nil {
 		return "unknown"
