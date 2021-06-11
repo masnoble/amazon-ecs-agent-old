@@ -258,7 +258,7 @@ func (agent *ecsAgent) setTerminationHandler(handler sighandlers.TerminationHand
 	agent.terminationHandler = handler
 }
 
-func (agent *ecsAgent) preStart() string {
+func (agent *ecsAgent) preStart() {
 
 
 
