@@ -30,6 +30,6 @@ func main() {
 	logger.InitSeelog()
 	exitcode := 0
 	agent := app.Run(os.Args[1:], &exitcode)
-	*agent.CleanUp()
+	(*agent).CleanUp()
 	os.Exit(exitcode)
 }
