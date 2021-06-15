@@ -92,7 +92,7 @@ var (
 // object. Its purpose is to mostly demonstrate how to interact with the
 // ecsAgent type.
 type agent interface {
-	preStart()
+	CleanUp()
 	// printECSAttributes prints the Agent's capabilities based on
 	// its environment
 	printECSAttributes() int
@@ -256,14 +256,6 @@ func (agent *ecsAgent) printECSAttributes() int {
 
 func (agent *ecsAgent) setTerminationHandler(handler sighandlers.TerminationHandler) {
 	agent.terminationHandler = handler
-}
-
-func (agent *ecsAgent) preStart() {
-
-
-
-	fmt.Printf("This is the end of the preStart function \n")
-
 }
 
 // start starts the ECS Agent
@@ -887,4 +879,15 @@ func (agent *ecsAgent) saveMetadata(key, val string) {
 	if err != nil {
 		seelog.Errorf("Failed to save agent metadata to disk (key: [%s], value: [%s]): %v", key, val, err)
 	}
+}
+
+func (agent *ecsAgent) CleanUp() {
+	seelog.Infof("Cleaning up the credentials endpoint setup for Amazon Elastic Container Service Agent")
+	err := agent.loopbackRouting.RestoreDefault()
+	if err !=nil{
+			seelog.Errorf("Failed to respore loopback routing: %v")
+	}
+	// Ignore error from Remove() as the netfilter might never have been
+	// added in the first place
+	agent.credentialsProxyRoute.Remove()
 }

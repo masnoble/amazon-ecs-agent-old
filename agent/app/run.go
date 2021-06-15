@@ -33,18 +33,18 @@ const (
 
 // Run runs the ECS Agent App. It returns an exit code, which is used by
 // main() to set the status code for the program
-func Run(arguments []string) int {
+func Run(arguments []string, exitcode *int) *agent {
 	defer log.Flush()
 
 	parsedArgs, err := args.New(arguments)
 	if err != nil {
-		return exitcodes.ExitTerminal
+		*exitcode = exitcodes.ExitTerminal
 	}
 
 	if *parsedArgs.License {
-		return printLicense()
+		*exitcode = printLicense()
 	} else if *parsedArgs.Version {
-		return version.PrintVersion()
+		*exitcode = version.PrintVersion()
 	} else if *parsedArgs.Healthcheck {
 		// Timeout is purposely set to shorter than the default docker healthcheck
 		// timeout of 30s. This is so that we can catch any http timeout and log the
@@ -57,7 +57,7 @@ func Run(arguments []string) int {
 			localhost = localhostOverride
 		}
 		healthcheckUrl := fmt.Sprintf("http://%s:51678/v1/metadata", localhost)
-		return runHealthcheck(healthcheckUrl, time.Second*25)
+		*exitcode = runHealthcheck(healthcheckUrl, time.Second*25)
 	}
 
 	if *parsedArgs.LogLevel != "" {
@@ -71,20 +71,21 @@ func Run(arguments []string) int {
 	if err != nil {
 		// Failure to initialize either the docker client or the EC2 metadata
 		// service client are non terminal errors as they could be transient
-		return exitcodes.ExitError
+		*exitcode = exitcodes.ExitError
 	}
-
-	agent.preStart()
 	
 	switch {
 	case *parsedArgs.ECSAttributes:
 		// Print agent's ecs attributes based on its environment and exit
-		return agent.printECSAttributes()
+		*exitcode = agent.printECSAttributes()
+		return &agent
 	case *parsedArgs.WindowsService:
 		// Enable Windows Service
-		return agent.startWindowsService()
+		*exitcode = agent.startWindowsService()
+		return &agent
 	default:
 		// Start the agent
-		return agent.start()
+		*exitcode = agent.start()
+		return &agent
 	}
 }

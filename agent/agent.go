@@ -17,7 +17,7 @@ import (
 	"math/rand"
 	"os"
 	"time"
-
+	"fmt"
 	"github.com/aws/amazon-ecs-agent/agent/app"
 	"github.com/aws/amazon-ecs-agent/agent/logger"
 )
@@ -28,5 +28,8 @@ func init() {
 
 func main() {
 	logger.InitSeelog()
-	os.Exit(app.Run(os.Args[1:]))
+	exitcode := 0
+	agent := app.Run(os.Args[1:], &exitcode)
+	*agent.CleanUp()
+	os.Exit(exitcode)
 }
