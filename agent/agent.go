@@ -17,7 +17,6 @@ import (
 	"math/rand"
 	"os"
 	"time"
-	"fmt"
 	"github.com/aws/amazon-ecs-agent/agent/app"
 	"github.com/aws/amazon-ecs-agent/agent/logger"
 )
